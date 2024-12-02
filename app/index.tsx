@@ -18,7 +18,7 @@ export default function ImageGallery(){
         <FlatList 
         data={imagesArr}
         keyExtractor={(data)=> data}
-        renderItem={(item)=>{
+        renderItem={({item})=>{
             return(
                 <Image style={{height: 200, aspectRatio: 4/2}}
                 source={{uri: item}}
