@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Image, FlatList, View} from "react-native";
+import { Image, FlatList, View, Alert} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
+import axios from "axios";
 
 
 const imagesArr = [
@@ -14,8 +15,34 @@ const imagesArr = [
 ]
 export default function ImageGallery(){
     const [image,setImage] = useState(imagesArr)
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.YOUR_CLOUD_NAME}/image/upload`;
 
-    const pickImage = async () => {
+
+    const uploadImageToCloudinary = async (imageuri: string) => {
+        if (!image) {
+          Alert.alert('No image selected', 'Please select an image first');
+          return;
+        }
+    
+        const data = new FormData();
+        data.append('file', imageuri);
+        data.append('upload_preset', 'expo_image_gallery'); 
+    
+        try {
+          const response = await axios.post(cloudinaryUrl, data, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+          Alert.alert('Success', 'Image uploaded successfully');
+          console.log('Cloudinary Response:', response.data);
+        } catch (error) {
+          console.error('Upload failed', error);
+          Alert.alert('Upload failed', 'Something went wrong');
+        }
+      };
+    
+        const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ['images'],
           allowsEditing: true,
@@ -26,10 +53,8 @@ export default function ImageGallery(){
         console.log(result);
     
         if (!result.canceled) {
-            setImage([result.assets[0].uri, ...image])
-            console.log(result.assets[0].uri)
-            console.log(result.assets[0])
-        //   setImage(result.assets[0].uri);
+           setImage([result.assets[0].uri])
+           uploadImageToCloudinary(result.assets[0].uri)
         }
       };
     
@@ -46,10 +71,8 @@ export default function ImageGallery(){
             console.log(result);
         
             if (!result.canceled) {
-                setImage([result.assets[0].uri, ...image])
-                console.log(result.assets[0].uri)
-                console.log(result.assets[0])
-            //   setImage(result.assets[0].uri);
+            setImage([result.assets[0].uri])
+            uploadImageToCloudinary(result.assets[0].uri)
             }
         }
       };
