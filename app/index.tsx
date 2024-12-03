@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Image, Text, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import { Image, FlatList, View} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Entypo from '@expo/vector-icons/Entypo';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const imagesArr = [
@@ -12,15 +13,60 @@ const imagesArr = [
     'https://plus.unsplash.com/premium_photo-1722209813944-a4ee13b7bfd8?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTd8fG1vYmlsZSUyMEFwcHxlbnwwfHwwfHx8MA%3D%3D'
 ]
 export default function ImageGallery(){
-    const [image,setimage] = useState(imagesArr)
+    const [image,setImage] = useState(imagesArr)
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+    
+        console.log(result);
+    
+        if (!result.canceled) {
+            setImage([result.assets[0].uri, ...image])
+            console.log(result.assets[0].uri)
+            console.log(result.assets[0])
+        //   setImage(result.assets[0].uri);
+        }
+      };
+    
+      const pickImagefrontcamera = async () => {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if(permission.granted){  
+            let result = await ImagePicker.launchCameraAsync({
+              mediaTypes: ['images'],
+              allowsEditing: true,
+              aspect: [4, 3],
+              quality: 1,
+            });
+        
+            console.log(result);
+        
+            if (!result.canceled) {
+                setImage([result.assets[0].uri, ...image])
+                console.log(result.assets[0].uri)
+                console.log(result.assets[0])
+            //   setImage(result.assets[0].uri);
+            }
+        }
+      };
+
+
   return (
-    <SafeAreaView style={{flex:1}}>
+    <SafeAreaView style={{flex:1,}}>
+        <View style={{flexDirection: 'column', padding: 20, position: 'absolute', zIndex: 12, right: -12, gap: 10, marginTop: 20}}>
+        <Entypo name="image" onPress={pickImage} size={24} color="black"  style={{backgroundColor: '#e4eaef', padding: 12, borderRadius: 125}}/>
+        <Entypo name="camera" onPress={pickImagefrontcamera} size={24} color="black"  style={{backgroundColor: '#e4eaef', padding: 12, borderRadius: 125}}/>
+        </View>
         <FlatList 
-        data={imagesArr}
+        data={image}
         keyExtractor={(data)=> data}
         renderItem={({item})=>{
             return(
-                <Image style={{height: 200, aspectRatio: 4/2}}
+                <Image style={{height: 230, marginVertical: 10}}
                 source={{uri: item}}
                 />
             )
