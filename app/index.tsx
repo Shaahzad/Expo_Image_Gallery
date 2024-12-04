@@ -5,7 +5,6 @@ import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
 
-
 const imagesArr = [
     'https://images.unsplash.com/photo-1614020661596-366a1afbb319?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bW9iaWxlJTIwQXBwfGVufDB8fDB8fHww',
     'https://images.unsplash.com/photo-1663153204614-6dfc8feebbf9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bW9iaWxlJTIwQXBwfGVufDB8fDB8fHww',
@@ -15,18 +14,22 @@ const imagesArr = [
 ]
 export default function ImageGallery(){
     const [image,setImage] = useState(imagesArr)
-    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.YOUR_CLOUD_NAME}/image/upload`;
 
-
-    const uploadImageToCloudinary = async (imageuri: string) => {
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/dqeneupli/image/upload`;
+    const uploadImageToCloudinary = async (imageuri: any): Promise<void> => {
         if (!image) {
           Alert.alert('No image selected', 'Please select an image first');
           return;
         }
     
         const data = new FormData();
-        data.append('file', imageuri);
+        data.append('file', {
+          uri: imageuri,
+          type: 'image/jpeg',
+          name: 'image',
+        } as any);
         data.append('upload_preset', 'expo_image_gallery'); 
+        data.append('folder', 'expo_image_gallery');
     
         try {
           const response = await axios.post(cloudinaryUrl, data, {
@@ -34,6 +37,7 @@ export default function ImageGallery(){
               'Content-Type': 'multipart/form-data',
             },
           });
+          setImage(response.data.secure_url)
           Alert.alert('Success', 'Image uploaded successfully');
           console.log('Cloudinary Response:', response.data);
         } catch (error) {
@@ -53,8 +57,9 @@ export default function ImageGallery(){
         console.log(result);
     
         if (!result.canceled) {
-           setImage([result.assets[0].uri])
+          //  setImage([result.assets[0].uri])
            uploadImageToCloudinary(result.assets[0].uri)
+
         }
       };
     
@@ -71,7 +76,7 @@ export default function ImageGallery(){
             console.log(result);
         
             if (!result.canceled) {
-            setImage([result.assets[0].uri])
+            // setImage([result.assets[0].uri])
             uploadImageToCloudinary(result.assets[0].uri)
             }
         }
