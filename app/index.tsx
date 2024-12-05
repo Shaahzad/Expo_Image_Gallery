@@ -5,6 +5,7 @@ import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {YOUR_CLOUD_NAME} from "@env";
 const imagesArr = [
     'https://images.unsplash.com/photo-1614020661596-366a1afbb319?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bW9iaWxlJTIwQXBwfGVufDB8fDB8fHww',
     'https://images.unsplash.com/photo-1663153204614-6dfc8feebbf9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8bW9iaWxlJTIwQXBwfGVufDB8fDB8fHww',
@@ -23,7 +24,7 @@ export default function ImageGallery(){
     }
     loadImage()
     },[])
-    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${process.env.YOUR_CLOUD_NAME}/image/upload`;
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${YOUR_CLOUD_NAME}/image/upload`;
     const uploadImageToCloudinary = async (imageuri: any): Promise<void> => {
         if (!image) {
           Alert.alert('No image selected', 'Please select an image first');
