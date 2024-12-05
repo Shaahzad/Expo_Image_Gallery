@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Image, FlatList, View, Alert} from "react-native";
+import { Image, FlatList, View, Alert, ActivityIndicator} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Entypo from '@expo/vector-icons/Entypo';
 import * as ImagePicker from 'expo-image-picker';
@@ -15,12 +15,17 @@ const imagesArr = [
 ]
 export default function ImageGallery(){
     const [image,setImage] = useState(imagesArr);
+    const [loading, setloading] = useState(false);
     useEffect(()=>{
     const loadImage = async () =>{
+      setloading(true)
       const savedImage = await AsyncStorage.getItem('images');
       if (savedImage) {
-        setImage((prevImages) => [...prevImages, savedImage]);
+        const parsedImg = JSON.parse(savedImage);
+        setImage((prevImages) => [...prevImages, parsedImg]);
+        console.log('Image URL:', parsedImg);
       }
+      setloading(false)
     }
     loadImage()
     },[])
@@ -30,7 +35,7 @@ export default function ImageGallery(){
           Alert.alert('No image selected', 'Please select an image first');
           return;
         }
-    
+        setloading(true)
         const data = new FormData();
         data.append('file', {
           uri: imageuri,
@@ -48,7 +53,9 @@ export default function ImageGallery(){
           });
           const imageUrl = response.data.secure_url;
           setImage((prevImages) => [...prevImages, imageUrl]);
-          await AsyncStorage.setItem('images', imageUrl);
+          console.log('Image URL:', imageUrl);
+          const stringifyimg = JSON.stringify(imageUrl)
+          await AsyncStorage.setItem('images', stringifyimg);
           console.log('Image URL:', imageUrl);
           Alert.alert('Success', 'Image uploaded successfully');
           console.log('Cloudinary Response:', response.data);
@@ -56,6 +63,7 @@ export default function ImageGallery(){
           console.error('Upload failed', error);
           Alert.alert('Upload failed', 'Something went wrong');
         }
+        setloading(false)
       };
     
         const pickImage = async () => {
@@ -101,17 +109,22 @@ export default function ImageGallery(){
         <Entypo name="image" onPress={pickImage} size={24} color="black"  style={{backgroundColor: '#e4eaef', padding: 12, borderRadius: 125}}/>
         <Entypo name="camera" onPress={pickImagefrontcamera} size={24} color="black"  style={{backgroundColor: '#e4eaef', padding: 12, borderRadius: 125}}/>
         </View>
-        <FlatList 
-        data={image}
-        keyExtractor={(data)=> data}
-        renderItem={({item})=>{
-            return(
-                <Image style={{height: 230, marginVertical: 10}}
-                source={{uri:item}}
-                />
-            )
-        }}
-        />
+        {
+          loading ? (<ActivityIndicator size="large" color="black" style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}/>) : (
+            
+            <FlatList 
+            data={image}
+            keyExtractor={(item, index) => `${item}-${index}`}
+            renderItem={({item})=>{
+                return(
+                    <Image style={{height: 230, marginVertical: 10}}
+                    source={{uri:item}}
+                    />
+                )
+            }}
+            />
+          )
+        }
     </SafeAreaView>
   )
 }
