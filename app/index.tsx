@@ -37,7 +37,7 @@ export default function ImageGallery() {
 
     const uploadImageToCloudinary = async (imageuri: any): Promise<void> => {
         if (!imageuri) {
-            Alert.alert('No image selected', 'Please select an image first');
+            Alert.alert('No image selected', 'Please Select an image first');
             return;
         }
         setLoading(true);
