@@ -117,7 +117,7 @@ export default function ImageGallery() {
                 <Entypo name="camera" onPress={pickImagefrontcamera} size={24} color="black" style={{ backgroundColor: '#e4eaef', padding: 12, borderRadius: 125 }} />
             </View>
             {loading ? (
-                <ActivityIndicator size="large" color="black" style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} />
+                <ActivityIndicator size="large" color="green" style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }} />
             ) : (
                 <FlatList
                     data={image}
